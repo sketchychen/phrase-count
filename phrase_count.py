@@ -11,7 +11,7 @@ def split_sentences(ss):
     return re.split("(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s", ss.strip()) # .strip() removes line breaks
     # in future consider how to check for "Mrs." as adding (?<!(Mrs)\.) creates a NoneType
 
-# CONVERT TXT FILE TO LIST OF STRINGS (that are sentences)
+# CONVERT TXT FILE TO LIST OF STRINGS (list of sentences)
 def file_sentence_list(ff):
     sentence_list = []
     for line in ff:
@@ -20,12 +20,14 @@ def file_sentence_list(ff):
     return [strip_punctuation(sentence).lower() for sentence in sentence_list]
 
 # REMOVE PUNCTUATION FOR BETTER DICTIONARY WORD COUNT
+# "hello puppy. Puppy is happy" will count puppy as ("puppy", 2) instead of ("puppy.", 1), ("Puppy", 1)
 def strip_punctuation(ss):
     # future: consider addressing contractions and possessives
     punctuation = ",:.?!"
     return ''.join(char for char in ss if char not in punctuation)
 
 # COUNT OCCURRENCE OF WORDS (as phrases are generally made up of words)
+# treating plural words as their own word for now
 def count_words(ss):
     word_count = defaultdict(int)
     for word in ss.split():
@@ -40,12 +42,14 @@ sentences = file_sentence_list(file_)
 words = count_words(" ".join(sentences))
 
 # WORDS THAT ONLY APPEAR ONCE IMPLY THAT THE PHRASES THEY'RE IN ALSO OCCUR ONCE
-single_occurrence_words = [word_count[0] for word_count in words.items() if word_count[1] == 1] # words.items() returns list of tuples
+single_occurrence_words = [word_count[0] for word_count in words.items() if word_count[1] == 1]
+    # words.items() returns list of tuples
 
 # SPLIT SENTENCES INTO FRAGMENTS BASED ON SINGLE-OCCURRING WORDS
-fragments = 
+def fragment_sentence_list(ll):
 
-# IGNORE FRAGMENTS WITH WORD LENGTH < 3 WORDS
+
+# IGNORE FRAGMENTS WITH WORD LENGTH < 3 WORDS (phrases are 3-10 words long)
 fragments = [fragment for fragment in fragments if len(fragment.split()) < 3]
 
 
