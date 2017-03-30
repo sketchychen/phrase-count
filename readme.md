@@ -3,6 +3,7 @@
 Given a string representing a document, write a function which returns the top 10 most frequent repeated phrases. A phrase is a stretch of three to ten consecutive words and cannot span sentences. Only include a phrase if it is not a subset of another, longer phrase (if “calm cool” and “calm cool and collected” are repeated, do not include “calm cool” in the returned set).
 
 ## current game plan:
+- LEARN HOW TO REGEX
 - convert txt file to list of strings
   - more specifically list of sentences, as phrases do not span sentences.
 - make everything lowercase and remove major punctuation (",:.?!") from words.
