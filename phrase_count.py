@@ -34,6 +34,28 @@ def count_words(ss):
         word_count[strip_punctuation(word).lower()] += 1
     return word_count
 
+# SPLIT SENTENCES INTO FRAGMENTS BASED ON SINGLE-OCCURRING WORDS
+def fragment_sentence_by_word(sentence, word_list):
+  # input string and list, return list
+    fragments = [sentence]
+    for word in word_list: # iterate through each word in word_list
+      for frag in fragments: # iterate through each "frag" (starts with a "full" sentence)
+        if word in frag.split():
+          temp = frag.split()
+          temp = temp[:temp.index(word)], temp[temp.index(word)+1:]
+          # IGNORE FRAGMENTS WITH WORD LENGTH < 3 WORDS (phrases are 3-10 words long)
+          fragments = [" ".join(words) for words in temp if len(words) >= 3]
+    return fragments
+
+# COMPILE ALL PHRASE-FEASIBLE FRAGMENTS INTO ONE LIST
+def fragment_sentence_list(sentence_list, word_list):
+    fragments = []
+    for sentence in sentence_list:
+        fragments.extend(fragment_sentence_by_word(sentence, word_list))
+    return fragments
+
+
+
 sentences = file_sentence_list(file_)
 
 # sentences is a list of strings while file_ is a file object, so might as well
@@ -46,32 +68,4 @@ single_occurrence_words = [word_count[0] for word_count in words.items() if word
     # words.items() returns list of tuples
 # print(single_occurrence_words)
 
-# SPLIT SENTENCES INTO FRAGMENTS BASED ON SINGLE-OCCURRING WORDS
-def fragment_sentence_by_word(sentence, word_list):
-    # input string and list, return list
-    fragments = [sentence]
-    # iterate through each word in word_list
-    for word in word_list:
-      temp = []
-      # iterate through each "frag" (starts with a "full" sentence)
-      for frag in fragments:
-        # IGNORE EMPTY FRAGMENTS AND FRAGMENTS WITH WORD LENGTH < 3 WORDS (phrases are 3-10 words long)
-        temp.extend([frag.strip() for frag in frag.split(word) if len(frag) > 0 and len(frag.split()) >= 3])
-        # THIS DOES NOT TAKE INTO ACCOUNT WORDS "WITHIN" WORDS (so you don't remove "a" from "america" and end up with "americ")
-      fragments = temp
-    return fragments
-
-# COMPILE ALL PHRASE-FEASIBLE FRAGMENTS INTO ONE LIST
-def fragment_sentence_list(sentence_list, word_list):
-    fragments = []
-    for sentence in sentence_list:
-        fragments.extend(fragment_sentence_by_word(sentence, word_list))
-    return fragments
-
-
 print(fragment_sentence_list(sentences, single_occurrence_words))
-
-# print(sentences)
-# print(sorted(words.items(), reverse=True, key=itemgetter(1)))
-# print(string.punctuation)
-# print([word_count[0] for word_count in words.items() if word_count[1] == 1])
