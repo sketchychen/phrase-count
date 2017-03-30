@@ -7,7 +7,7 @@ filename = "samuel_l_jackson.txt"
 file_ = open(filename)
 
 # GENERATE LIST OF SENTENCES (phrases do not span sentences)
-def split_sentences(ss):
+def split_into_sentences(ss):
     return re.split("(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s", ss.strip()) # .strip() removes line breaks
     # in future consider how to check for "Mrs." as adding (?<!(Mrs)\.) creates a NoneType
 
@@ -16,7 +16,7 @@ def file_sentence_list(ff):
     sentence_list = []
     for line in ff:
         if line is not "\n":
-            sentence_list.extend(split_sentences(line))
+            sentence_list.extend(split_into_sentences(line))
     return [strip_punctuation(sentence).lower() for sentence in sentence_list]
 
 # REMOVE PUNCTUATION FOR BETTER DICTIONARY WORD COUNT
@@ -44,14 +44,32 @@ words = count_words(" ".join(sentences))
 # WORDS THAT ONLY APPEAR ONCE IMPLY THAT THE PHRASES THEY'RE IN ALSO OCCUR ONCE
 single_occurrence_words = [word_count[0] for word_count in words.items() if word_count[1] == 1]
     # words.items() returns list of tuples
+# print(single_occurrence_words)
 
 # SPLIT SENTENCES INTO FRAGMENTS BASED ON SINGLE-OCCURRING WORDS
-def fragment_sentence_list(ll):
+def fragment_sentence_by_word(sentence, word_list):
+    # input string and list, return list
+    fragments = [sentence]
+    # iterate through each word in word_list
+    for word in word_list:
+      temp = []
+      # iterate through each "frag" (starts with a "full" sentence)
+      for frag in fragments:
+        # IGNORE EMPTY FRAGMENTS AND FRAGMENTS WITH WORD LENGTH < 3 WORDS (phrases are 3-10 words long)
+        temp.extend([frag.strip() for frag in frag.split(word) if len(frag) > 0 and len(frag.split()) >= 3])
+        # THIS DOES NOT TAKE INTO ACCOUNT WORDS "WITHIN" WORDS (so you don't remove "a" from "america" and end up with "americ")
+      fragments = temp
+    return fragments
+
+# COMPILE ALL PHRASE-FEASIBLE FRAGMENTS INTO ONE LIST
+def fragment_sentence_list(sentence_list, word_list):
+    fragments = []
+    for sentence in sentence_list:
+        fragments.extend(fragment_sentence_by_word(sentence, word_list))
+    return fragments
 
 
-# IGNORE FRAGMENTS WITH WORD LENGTH < 3 WORDS (phrases are 3-10 words long)
-fragments = [fragment for fragment in fragments if len(fragment.split()) < 3]
-
+print(fragment_sentence_list(sentences, single_occurrence_words))
 
 # print(sentences)
 # print(sorted(words.items(), reverse=True, key=itemgetter(1)))
