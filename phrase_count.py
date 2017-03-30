@@ -1,7 +1,7 @@
 from collections import defaultdict
 # from collections import OrderedDict
 from operator import itemgetter
-import re, string
+import re
 
 filename = "samuel_l_jackson.txt"
 file_ = open(filename)
