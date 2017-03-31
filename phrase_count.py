@@ -1,5 +1,4 @@
 from collections import defaultdict
-# from collections import OrderedDict
 from operator import itemgetter
 import re
 
@@ -70,7 +69,6 @@ def multiple_n_word_phrases(ss, phrase_lengths): # phrase_lengths is a list of p
         phrase_list.extend(get_n_word_phrases(ss, n))
     return phrase_list
 
-
 # GENERATE DEFAULTDICT OF POSSIBLE PHRASES AND THEIR COUNTS
 def count_phrases(sentence_list, phrase_lengths): # both are list inputs
     phrase_count = defaultdict(int)
@@ -83,12 +81,13 @@ def count_phrases(sentence_list, phrase_lengths): # both are list inputs
         # if the sentence is less than the maximum number of words
         elif len(sentence.split()) < max(phrase_lengths):
             # run get_n_word_phrases from minimum to up to just the length of the sentence
-            phrase_list = multiple_n_word_phrases(sentence, range(min(phrase_lengths), len(sentence.split())))
+            phrase_list = multiple_n_word_phrases(sentence, range(min(phrase_lengths), len(sentence.split())+1))
         # if the sentence is greater than the maximum number of words
         elif len(sentence.split()) >= max(phrase_lengths):
             # run get_n_word_phrases with the given phrase_lengths
             phrase_list = multiple_n_word_phrases(sentence, phrase_lengths)
-        # else, sentence is less than the minimum number of words, so don't do anything.
+        # else, sentence is probably less than the minimum number of words,
+            # so don't do anything.
 
         # bookkeep every phrase generated from a sentence
         for phrase in phrase_list:
@@ -98,6 +97,29 @@ def count_phrases(sentence_list, phrase_lengths): # both are list inputs
 
 # SORT DEFAULTDICT OF PHRASES BY PHRASE LENGTH AND COMPARE ITEMS IN DEFAULTDICT TO ONE ANOTHER
 # TO FIND AND REMOVE SUBSETS WHERE APPROPRIATE
+def find_subset_phrases(phrase_count_dict):
+    sorted_by_len = sorted(phrase_count.items(), key=lambda s: len(s[0])) # sort the dict by phrase length ascending (and as tuples, looks like)
+    # if a phrase1 is found in phrase2 but phrase1's count is higher, it's not a subset
+    # if a phrase1 is found in phrase2 and has the same phrase count (or less? is that even possible?), it's a subset
+    # so only remove a phrase if a same phrase count condition is met
+    index1 = 0
+    index2 = index1 + 1
+    while index1 < len(sorted_by_len)-1:
+        subset_found = False
+        index2 = index1 + 1
+        while index2 < len(sorted_by_len)-1 and not subset_found:
+            phrase1 = sorted_by_len[index1]
+            phrase2 = sorted_by_len[index2]
+            if len(phrase1[0].split()) < len(phrase2[0].split()) and phrase1[0] in phrase2[0] and phrase1[1] <= phrase2[1]:
+                subset_found = True
+                del sorted_by_len[index1]
+            else:
+                index2 += 1
+        if not subset_found:
+            index1 += 1
+        # print(sorted_by_len)
+    return sorted(sorted_by_len, key=lambda s: s[1], reverse=True)
+
 
 
 sentences = file_sentence_list(file_)
@@ -115,5 +137,9 @@ single_occurrence_words = [word_count[0] for word_count in words.items() if word
 fragments = fragment_sentence_list(sentences, single_occurrence_words)
 phrase_count = count_phrases(fragments, range(3, 10))
 
-print(fragments)
-print(phrase_count)
+# print(fragments)
+# print(get_n_word_phrases(fragments[8], 7))
+# print(phrase_count)
+# print(sorted(phrase_count.items(), key=lambda s: len(s[0])))
+# print(sorted(phrase_count.items(), key=lambda s: s[1], reverse=True))
+print(find_subset_phrases(phrase_count))
