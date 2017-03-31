@@ -124,7 +124,7 @@ def find_subset_phrases(phrase_count_dict):
 
 sentences = file_sentence_list(file_)
 
-### FRAGMENTING FUNCTIONS NOT ACTUALLY NEEDED
+### WORD COUNTING AND FRAGMENTING FUNCTIONS ARE NOT ACTUALLY NEEDED
 # # sentences is a list of strings while file_ is a file object, so might as well
 # # use what's already got strings instead of converting file_ to string again
 # # to get the list of words
