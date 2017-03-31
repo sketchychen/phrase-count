@@ -124,22 +124,20 @@ def find_subset_phrases(phrase_count_dict):
 
 sentences = file_sentence_list(file_)
 
-# sentences is a list of strings while file_ is a file object, so might as well
-# use what's already got strings instead of converting file_ to string again
-# to get the list of words
-words = count_words(" ".join(sentences))
+### FRAGMENTING FUNCTIONS NOT ACTUALLY NEEDED
+# # sentences is a list of strings while file_ is a file object, so might as well
+# # use what's already got strings instead of converting file_ to string again
+# # to get the list of words
+# words = count_words(" ".join(sentences))
+#
+# # WORDS THAT ONLY APPEAR ONCE IMPLY THAT THE PHRASES THEY'RE IN ALSO OCCUR ONCE
+# single_occurrence_words = [word_count[0] for word_count in words.items() if word_count[1] == 1]
+#     # words.items() returns list of tuples
+# # print(single_occurrence_words)
+#
+# fragments = fragment_sentence_list(sentences, single_occurrence_words)
+# phrase_count = count_phrases(fragments, range(3, 10))
+# print(find_subset_phrases(phrase_count))
 
-# WORDS THAT ONLY APPEAR ONCE IMPLY THAT THE PHRASES THEY'RE IN ALSO OCCUR ONCE
-single_occurrence_words = [word_count[0] for word_count in words.items() if word_count[1] == 1]
-    # words.items() returns list of tuples
-# print(single_occurrence_words)
-
-fragments = fragment_sentence_list(sentences, single_occurrence_words)
-phrase_count = count_phrases(fragments, range(3, 10))
-
-# print(fragments)
-# print(get_n_word_phrases(fragments[8], 7))
-# print(phrase_count)
-# print(sorted(phrase_count.items(), key=lambda s: len(s[0])))
-# print(sorted(phrase_count.items(), key=lambda s: s[1], reverse=True))
-print(find_subset_phrases(phrase_count))
+phrase_count = count_phrases(sentences, range(3, 10))
+print(find_subset_phrases(phrase_count)[:10])
