@@ -54,6 +54,50 @@ def fragment_sentence_list(sentence_list, word_list):
         fragments.extend(fragment_sentence_by_word(sentence, word_list))
     return fragments
 
+# GENERATE LIST OF PHRASES WITH WORD LENGTH INT N FROM GIVEN STRING
+def get_n_word_phrases(ss, n):
+  phrase_list = []
+  ss_split = ss.split()
+  if len(ss_split) >= n: # ideally we account for this in our input but it's here too just in case
+    for i in range(0, len(ss_split)-n+1):
+      phrase = " ".join(ss_split[i:i+n])
+      phrase_list.append(phrase)
+  return phrase_list # returns empty if n > len(ss_split)
+
+def multiple_n_word_phrases(ss, phrase_lengths): # phrase_lengths is a list of positive integers, or range(i, j)
+    phrase_list = []
+    for n in phrase_lengths:
+        phrase_list.extend(get_n_word_phrases(ss, n))
+    return phrase_list
+
+
+# GENERATE DEFAULTDICT OF POSSIBLE PHRASES AND THEIR COUNTS
+def count_phrases(sentence_list, phrase_lengths): # both are list inputs
+    phrase_count = defaultdict(int)
+    for sentence in sentence_list:
+        phrase_list = []
+        # if the sentence is the minimum number of words
+        if len(sentence.split()) == min(phrase_lengths):
+            # run get_n_word_phrases only once
+            phrase_list = get_n_word_phrases(sentence, len(sentence.split()))
+        # if the sentence is less than the maximum number of words
+        elif len(sentence.split()) < max(phrase_lengths):
+            # run get_n_word_phrases from minimum to up to just the length of the sentence
+            phrase_list = multiple_n_word_phrases(sentence, range(min(phrase_lengths), len(sentence.split())))
+        # if the sentence is greater than the maximum number of words
+        elif len(sentence.split()) >= max(phrase_lengths):
+            # run get_n_word_phrases with the given phrase_lengths
+            phrase_list = multiple_n_word_phrases(sentence, phrase_lengths)
+        # else, sentence is less than the minimum number of words, so don't do anything.
+
+        # bookkeep every phrase generated from a sentence
+        for phrase in phrase_list:
+            phrase_count[phrase] += 1
+
+    return phrase_count
+
+# SORT DEFAULTDICT OF PHRASES BY PHRASE LENGTH AND COMPARE ITEMS IN DEFAULTDICT TO ONE ANOTHER
+# TO FIND AND REMOVE SUBSETS WHERE APPROPRIATE
 
 
 sentences = file_sentence_list(file_)
@@ -68,4 +112,8 @@ single_occurrence_words = [word_count[0] for word_count in words.items() if word
     # words.items() returns list of tuples
 # print(single_occurrence_words)
 
-print(fragment_sentence_list(sentences, single_occurrence_words))
+fragments = fragment_sentence_list(sentences, single_occurrence_words)
+phrase_count = count_phrases(fragments, range(3, 10))
+
+print(fragments)
+print(phrase_count)
